@@ -1,0 +1,33 @@
+<div class="chess-container">
+  <div class="board" cdkDropListGroup>
+    <div *ngFor="let row of boardGrid; let rIdx = index" class="board-row">
+      <div
+        *ngFor="let piece of row; let cIdx = index"
+        class="square"
+        [ngClass]="(rIdx + cIdx) % 2 === 0 ? 'light' : 'dark'" 
+        cdkDropList
+        (cdkDropListDropped)="onDrop($event, rIdx, cIdx)"
+      >
+        <div class="check-overlay" *ngIf="isKingInCheck(piece, rIdx, cIdx)"></div>
+
+        <div
+          class="last-move-highlight"
+          *ngIf="
+            (gameState.status$ | async)?.lastMove?.from === getAlgebraicCoords(rIdx, cIdx) ||
+            (gameState.status$ | async)?.lastMove?.to === getAlgebraicCoords(rIdx, cIdx)
+          "
+        ></div>
+
+        <img
+          *ngIf="piece"
+          [src]="pieceImages[piece]"
+          class="piece-img"
+          cdkDrag
+          [cdkDragData]="getAlgebraicCoords(rIdx, cIdx)"
+        />
+        
+        <div *cdkDragPlaceholder class="cdk-drag-placeholder"></div>
+      </div>
+    </div>
+  </div>
+</div>

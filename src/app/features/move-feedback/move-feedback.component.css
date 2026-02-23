@@ -1,0 +1,53 @@
+.history-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #262421;
+  color: #bababa;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.move-row {
+  display: flex;
+  padding: 5px 10px;
+  font-size: 14px;
+}
+
+.move-row.header {
+  font-weight: bold;
+  border-bottom: 1px solid #403d39;
+  margin-bottom: 5px;
+}
+
+.scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 300px; /* Adjust based on your side panel height */
+}
+
+.move-row:not(.header):hover {
+  background-color: #363431;
+  cursor: pointer;
+}
+
+/* Columns */
+.num {
+  width: 40px;
+  color: #666;
+}
+
+.move {
+  flex: 1;
+  font-weight: 500;
+  color: #e5e5e5;
+}
+
+/* Custom Scrollbar */
+.scroll-area::-webkit-scrollbar {
+  width: 8px;
+}
+.scroll-area::-webkit-scrollbar-thumb {
+  background: #403d39;
+  border-radius: 4px;
+}

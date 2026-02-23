@@ -1,0 +1,31 @@
+<div class="main-layout">
+  <div class="game-container" style="align-items: center;">
+    
+    <div class="player-info top">
+      <div class="user-tag">
+        <img src="assets/pieces/bp.png" class="avatar">
+        <span class="player-name">Player 2 (Black)</span>
+      </div>
+      <div class="timer" [class.inactive]="currentTurn === 'white'">
+        {{ ((gameState.blackTime$ | async)! * 1000) | date:'mm:ss' }}
+      </div>
+    </div>
+
+    <app-board></app-board>
+
+    <div class="player-info bottom">
+      <div class="user-tag">
+        <img src="assets/pieces/wp.png" class="avatar">
+        <span class="player-name">Player 1 (White)</span>
+      </div>
+      <div class="timer" [class.inactive]="currentTurn === 'black'">
+        {{ ((gameState.whiteTime$ | async)! * 1000) | date:'mm:ss' }}
+      </div>
+    </div>
+  </div>
+
+  <div class="side-panel">
+    <app-move-feedback></app-move-feedback>
+    <app-controls></app-controls>
+  </div>
+</div>

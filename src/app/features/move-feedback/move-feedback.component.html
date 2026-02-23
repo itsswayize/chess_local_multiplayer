@@ -1,0 +1,15 @@
+<div class="history-container">
+  <div class="move-row header">
+    <span class="num">#</span>
+    <span class="move">White</span>
+    <span class="move">Black</span>
+  </div>
+  
+  <div class="scroll-area">
+    <div class="move-row" *ngFor="let pair of movePairs" [class.odd]="pair.number % 2 !== 0">
+      <span class="num">{{ pair.number }}.</span>
+      <span class="move">{{ pair.white }}</span>
+      <span class="move">{{ pair.black }}</span>
+    </div>
+  </div>
+</div>
