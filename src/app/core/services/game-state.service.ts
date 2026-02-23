@@ -48,19 +48,17 @@ private handleTimeout(winner: 'w' | 'b') {
   alert(`Game Over: ${winner === 'w' ? 'White' : 'Black'} wins on time!`);
 }
 
-  // Add this inside your move() method after success
-public move(from: string, to: string): boolean {
-  const success = this.validator.makeMove(from, to);
-  if (success) {
-    if (!this.timerSubscription) this.startTimer();
-    const status = this.validator.getGameStatus();
-    this.statusSubject.next(status);
-
-    // Trigger the Stockfish engine to analyze the new position
-    // this.engineService.analyzePosition(status.fen); 
+// Add promotion?: string to the parameters
+  public move(from: string, to: string, promotion?: string): boolean {
+    // Pass the promotion down to the validator
+    const success = this.validator.makeMove(from, to, promotion);
+    if (success) {
+      if (!this.timerSubscription) this.startTimer();
+      const status = this.validator.getGameStatus();
+      this.statusSubject.next(status);
+    }
+    return success;
   }
-  return success;
-}
 
 public getLatestStatus(): GameStatus | null {
   return this.statusSubject.value;

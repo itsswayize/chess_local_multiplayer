@@ -28,6 +28,10 @@ export class BoardComponent implements OnInit {
     'K': 'assets/pieces/wk.png'
   };
 
+  // --- New variables for pawn promotion ---
+  pendingPromotion: { from: string, to: string, toRank: number, toFile: number } | null = null;
+  promotionColor: 'w' | 'b' = 'w';
+
   // CHANGED: constructor uses 'public' so the template can access gameState.status$
   constructor(public gameState: GameStateService) {}
 
@@ -38,22 +42,22 @@ export class BoardComponent implements OnInit {
   }
 
   // Add this method inside your BoardComponent class
-isKingInCheck(piece: string | null, row: number, col: number): boolean {
-  if (!piece) return false;
+  isKingInCheck(piece: string | null, row: number, col: number): boolean {
+    if (!piece) return false;
 
-  // Retrieve current game status from the service
-  // We use the current turn to identify which king should be highlighted red
-  const status = this.gameState.getLatestStatus(); 
-  if (!status || !status.isCheck) return false;
+    // Retrieve current game status from the service
+    // We use the current turn to identify which king should be highlighted red
+    const status = this.gameState.getLatestStatus(); 
+    if (!status || !status.isCheck) return false;
 
-  const isWhiteTurn = status.turn === 'w';
-  
-  // Check if the piece is the King belonging to the side currently in check
-  // 'K' is white king, 'k' is black king
-  const isTargetKing = isWhiteTurn ? piece === 'K' : piece === 'k';
-  
-  return isTargetKing;
-}
+    const isWhiteTurn = status.turn === 'w';
+    
+    // Check if the piece is the King belonging to the side currently in check
+    // 'K' is white king, 'k' is black king
+    const isTargetKing = isWhiteTurn ? piece === 'K' : piece === 'k';
+    
+    return isTargetKing;
+  }
 
   renderBoard(fen: string) {
     const rows = fen.split(' ')[0].split('/');
@@ -67,14 +71,28 @@ isKingInCheck(piece: string | null, row: number, col: number): boolean {
     });
   }
 
-  onDrop(event: CdkDragDrop<any>, targetRow: number, targetCol: number) {
-    const from = event.item.data; 
-    const to = this.getAlgebraicCoords(targetRow, targetCol);
+  // --- Update your existing onDrop method ---
+  onDrop(event: any, rIdx: number, cIdx: number) {
+    const from = event.item.data;
+    const to = this.getAlgebraicCoords(rIdx, cIdx);
 
-    if (from && to) {
-      const success = this.gameState.move(from, to);
-      console.log(`Moving from ${from} to ${to}. Success: ${success}`);
+    // Grab the image element to easily check if the moving piece is a pawn
+    const imgElement = event.item.element.nativeElement as HTMLImageElement;
+    const isWhitePawn = imgElement.src.includes('wp.png');
+    const isBlackPawn = imgElement.src.includes('bp.png');
+
+    // If White reaches rank index 0, or Black reaches rank index 7, it's a promotion
+    const isPromotion = (isWhitePawn && rIdx === 0) || (isBlackPawn && rIdx === 7);
+
+    if (isPromotion) {
+      // Pause the move and show the UI
+      this.pendingPromotion = { from, to, toRank: rIdx, toFile: cIdx };
+      this.promotionColor = isWhitePawn ? 'w' : 'b';
+      return; 
     }
+
+    // Normal move execution
+    this.gameState.move(from, to);
   }
 
   public getAlgebraicCoords(row: number, col: number): string {
@@ -83,5 +101,26 @@ isKingInCheck(piece: string | null, row: number, col: number): boolean {
     return files[col] + ranks[row];
   }
 
-  
+  // --- Add these new helper methods ---
+  confirmPromotion(piece: string) {
+    if (this.pendingPromotion) {
+      this.gameState.move(this.pendingPromotion.from, this.pendingPromotion.to, piece);
+      this.pendingPromotion = null;
+    }
+  }
+
+  cancelPromotion() {
+    this.pendingPromotion = null;
+  }
+
+  // Dynamically positions the popup exactly over the target square
+  getPromotionStyle() {
+    if (!this.pendingPromotion) return {};
+    const isWhite = this.promotionColor === 'w';
+    return {
+      'left': `calc(${this.pendingPromotion.toFile} * 12.5%)`,
+      'top': isWhite ? '0' : 'auto',
+      'bottom': isWhite ? 'auto' : '0'
+    };
+  }
 }

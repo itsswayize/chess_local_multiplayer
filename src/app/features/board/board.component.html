@@ -29,5 +29,15 @@
         <div *cdkDragPlaceholder class="cdk-drag-placeholder"></div>
       </div>
     </div>
+    <div class="promotion-modal" *ngIf="pendingPromotion">
+      <div class="promotion-dialog" [ngStyle]="getPromotionStyle()">
+        <img [src]="'assets/pieces/' + promotionColor + 'q.png'" (click)="confirmPromotion('q')">
+        <img [src]="'assets/pieces/' + promotionColor + 'n.png'" (click)="confirmPromotion('n')">
+        <img [src]="'assets/pieces/' + promotionColor + 'r.png'" (click)="confirmPromotion('r')">
+        <img [src]="'assets/pieces/' + promotionColor + 'b.png'" (click)="confirmPromotion('b')">
+        <button class="close-promo" (click)="cancelPromotion()">✕</button>
+      </div>
+  </div>
+    
   </div>
 </div>

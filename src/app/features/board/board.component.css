@@ -7,10 +7,9 @@
 }
 
 .board {
-  /* This ensures the board is always square */
+  position: relative; 
   aspect-ratio: 1 / 1;
   width: 100%;
-  /* These clamp the board size so it never overflows the screen on Desktop or Mobile */
   max-width: 80vh; 
   max-height: 100%; 
   display: flex; 
@@ -19,10 +18,45 @@
   border-radius: 4px;
   box-sizing: border-box;
 }
+
+
 .board-row {
   display: flex;
   flex: 1; 
   width: 100%;
+}
+
+.promotion-modal {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.3); 
+  z-index: 2000; 
+}
+.promotion-dialog {
+  position: absolute;
+  width: 12.5%; /* Exactly the width of one chessboard square */
+  background-color: #f1f1f1;
+  border-radius: 4px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+  display: flex;
+  flex-direction: column;
+  z-index: 2001;
+  overflow: hidden;
+  animation: popIn 0.15s ease-out;
+}
+
+.promotion-dialog img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  cursor: pointer;
+  padding: 5px;
+  box-sizing: border-box;
+  transition: background-color 0.2s;
+}
+
+.promotion-dialog img:hover {
+  background-color: #d8d8d8;
 }
 
 .board-wrapper {
@@ -42,6 +76,26 @@
   pointer-events: none;
 }
 
+.close-promo {
+  background: #312e2b;
+  color: #bababa;
+  border: none;
+  padding: 8px 0;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+
+.close-promo:hover {
+  background: #262421;
+  color: #fff;
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
 
 
 .square {
