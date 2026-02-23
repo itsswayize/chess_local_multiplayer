@@ -1,31 +1,44 @@
-<div class="main-layout">
-  <div class="game-container" style="align-items: center;">
-    
-    <div class="player-info top">
-      <div class="user-tag">
-        <img src="assets/pieces/bp.png" class="avatar">
+<div class="chess-layout">
+  
+  <div class="board-section">
+    <app-board></app-board>
+  </div>
+
+  <div class="profile-section opponent">
+    <div class="user-info">
+      <img src="assets/pieces/bp.png" class="avatar">
+      <div class="details">
         <span class="player-name">Player 2 (Black)</span>
-      </div>
-      <div class="timer" [class.inactive]="currentTurn === 'white'">
-        {{ ((gameState.blackTime$ | async)! * 1000) | date:'mm:ss' }}
+        <div class="captured-pieces">
+          <img *ngFor="let piece of blackCapturedPieces" [src]="piece" class="captured-icon">
+          <span class="material-advantage" *ngIf="blackAdvantage > 0">+{{ blackAdvantage }}</span>
+        </div>
       </div>
     </div>
-
-    <app-board></app-board>
-
-    <div class="player-info bottom">
-      <div class="user-tag">
-        <img src="assets/pieces/wp.png" class="avatar">
-        <span class="player-name">Player 1 (White)</span>
-      </div>
-      <div class="timer" [class.inactive]="currentTurn === 'black'">
-        {{ ((gameState.whiteTime$ | async)! * 1000) | date:'mm:ss' }}
-      </div>
+    <div class="timer" [class.inactive]="currentTurn === 'white'">
+      {{ ((gameState.blackTime$ | async)! * 1000) | date:'mm:ss' }}
     </div>
   </div>
 
-  <div class="side-panel">
+  <div class="moves-section">
     <app-move-feedback></app-move-feedback>
     <app-controls></app-controls>
   </div>
+
+  <div class="profile-section player">
+    <div class="user-info">
+      <img src="assets/pieces/wp.png" class="avatar">
+      <div class="details">
+        <span class="player-name">Player 1 (White)</span>
+        <div class="captured-pieces">
+          <img *ngFor="let piece of whiteCapturedPieces" [src]="piece" class="captured-icon">
+          <span class="material-advantage" *ngIf="whiteAdvantage > 0">+{{ whiteAdvantage }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="timer" [class.inactive]="currentTurn === 'black'">
+      {{ ((gameState.whiteTime$ | async)! * 1000) | date:'mm:ss' }}
+    </div>
+  </div>
+
 </div>

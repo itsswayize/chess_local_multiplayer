@@ -20,12 +20,13 @@
   margin-bottom: 5px;
 }
 
+/* Update just the .scroll-area class */
 .scroll-area {
   flex: 1;
   overflow-y: auto;
-  max-height: 300px; /* Adjust based on your side panel height */
+  /* Remove the fixed max-height: 300px; you had previously */
+  max-height: none; 
 }
-
 .move-row:not(.header):hover {
   background-color: #363431;
   cursor: pointer;

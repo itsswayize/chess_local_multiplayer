@@ -8,10 +8,49 @@
   margin: 0 auto;
 }
 
+.player {
+  grid-column: 2 / 3;
+  grid-row: 3 / 4;
+}
+
 .user-tag {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.board-section {
+  grid-column: 1 / 2;
+  grid-row: 1 / 4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+
+.moves-section {
+  grid-column: 2 / 3;
+  grid-row: 2 / 3;
+  background-color: var(--bg-panel);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Prevents move list from expanding the grid */
+}
+
+.chess-layout {
+  display: grid;
+  grid-template-columns: 1fr 350px; /* Board takes left, Sidebar takes right 350px */
+  grid-template-rows: auto 1fr auto; /* Profiles auto-size, Move list fills remaining */
+  gap: 15px;
+  width: 100vw;
+  max-width: 1400px; /* Prevents it from getting too wide on ultrawides */
+  height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+  margin: 0 auto;
 }
 
 .avatar {
@@ -21,10 +60,54 @@
   background-color: #3c3934; /* Darker box for the icon */
 }
 
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .player-name {
   font-weight: 600;
   font-size: 14px;
   color: #bababa;
+}
+
+.captured-pieces {
+  display: flex;
+  align-items: center; /* Centers the pieces and text vertically */
+  gap: 2px;
+  height: 16px;
+}
+
+.captured-icon {
+  height: 100%;
+  opacity: 0.8;
+}
+
+.material-advantage {
+  font-size: 13px;
+  color: #989795; /* Same subtle grey used on Chess.com */
+  font-weight: 500;
+  margin-left: 5px;
+  line-height: 1;
+}
+
+.avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 4px;
+  background-color: #3c3934;
+}
+
+.opponent {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
 }
 
 .timer {
@@ -44,4 +127,35 @@
 .timer.inactive {
   opacity: 0.4;
   filter: blur(0.5px) grayscale(100%);
+}
+
+/* Medium Screens (Tablets) */
+@media (max-width: 1024px) {
+  .chess-layout {
+    grid-template-columns: 1fr 280px; /* Narrower sidebar */
+    gap: 10px;
+    padding: 15px;
+  }
+}
+
+/* Small Screens (Mobile) */
+@media (max-width: 768px) {
+  .chess-layout {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+    padding: 10px;
+  }
+  
+  /* Flexbox order dynamically rearranges the UI to match Chess.com mobile layout */
+  .opponent { order: 1; }
+  .board-section { order: 2; margin: 10px 0; }
+  .moves-section { 
+    order: 3; 
+    min-height: 250px; 
+    max-height: 400px; 
+    margin-bottom: 10px;
+  }
+  .player { order: 4; }
 }
