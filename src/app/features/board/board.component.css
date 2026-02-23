@@ -228,3 +228,31 @@
   height: 20px;
   opacity: 0.8;
 }
+
+/* Highlights the piece that the user currently clicked */
+.selected-square {
+  background-color: rgba(155, 199, 0, 0.41) !important; 
+}
+
+/* The subtle grey dot on empty squares (Chess.com style) */
+.legal-move-dot {
+  width: 32%;
+  height: 32%;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.15);
+  position: absolute;
+  pointer-events: none; /* Crucial: lets the click pass through to the square */
+  z-index: 3;
+}
+
+/* The subtle grey ring wrapping around an enemy piece (Capture indicator) */
+.legal-move-ring {
+  width: 85%;
+  height: 85%;
+  border-radius: 50%;
+  border: 5px solid rgba(0, 0, 0, 0.15);
+  position: absolute;
+  pointer-events: none; /* Crucial: lets the click pass through */
+  z-index: 4; /* Higher than the piece image so it draws on top */
+  box-sizing: border-box;
+}

@@ -60,6 +60,11 @@ private handleTimeout(winner: 'w' | 'b') {
     return success;
   }
 
+// Pass-through method to get legal moves for click-to-move highlighting
+  public getLegalMoves(square: string): string[] {
+    return this.validator.getLegalMoves(square);
+  }
+
 public getLatestStatus(): GameStatus | null {
   return this.statusSubject.value;
 }

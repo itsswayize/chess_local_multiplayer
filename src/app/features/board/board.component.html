@@ -4,9 +4,14 @@
       <div
         *ngFor="let piece of row; let cIdx = index"
         class="square"
-        [ngClass]="(rIdx + cIdx) % 2 === 0 ? 'light' : 'dark'" 
+        [ngClass]="{
+          'light': (rIdx + cIdx) % 2 === 0,
+          'dark': (rIdx + cIdx) % 2 !== 0,
+          'selected-square': selectedSquare === getAlgebraicCoords(rIdx, cIdx)
+        }" 
         cdkDropList
         (cdkDropListDropped)="onDrop($event, rIdx, cIdx)"
+        (click)="onSquareClick(rIdx, cIdx)"
       >
         <div class="check-overlay" *ngIf="isKingInCheck(piece, rIdx, cIdx)"></div>
 
@@ -17,6 +22,9 @@
             (gameState.status$ | async)?.lastMove?.to === getAlgebraicCoords(rIdx, cIdx)
           "
         ></div>
+
+        <div class="legal-move-dot" *ngIf="isLegalMove(rIdx, cIdx) && !piece"></div>
+        <div class="legal-move-ring" *ngIf="isLegalMove(rIdx, cIdx) && piece"></div>
 
         <img
           *ngIf="piece"

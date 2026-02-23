@@ -14,25 +14,20 @@ export class BoardComponent implements OnInit {
   boardGrid: any[][] = [];
   
   pieceImages: { [key: string]: string } = {
-    'p': 'assets/pieces/bp.png',
-    'r': 'assets/pieces/br.png',
-    'n': 'assets/pieces/bn.png',
-    'b': 'assets/pieces/bb.png',
-    'q': 'assets/pieces/bq.png',
-    'k': 'assets/pieces/bk.png',
-    'P': 'assets/pieces/wp.png',
-    'R': 'assets/pieces/wr.png',
-    'N': 'assets/pieces/wn.png',
-    'B': 'assets/pieces/wb.png',
-    'Q': 'assets/pieces/wq.png',
-    'K': 'assets/pieces/wk.png'
+    'p': 'assets/pieces/bp.png', 'r': 'assets/pieces/br.png', 'n': 'assets/pieces/bn.png',
+    'b': 'assets/pieces/bb.png', 'q': 'assets/pieces/bq.png', 'k': 'assets/pieces/bk.png',
+    'P': 'assets/pieces/wp.png', 'R': 'assets/pieces/wr.png', 'N': 'assets/pieces/wn.png',
+    'B': 'assets/pieces/wb.png', 'Q': 'assets/pieces/wq.png', 'K': 'assets/pieces/wk.png'
   };
 
-  // --- New variables for pawn promotion ---
+  // --- Pawn Promotion State ---
   pendingPromotion: { from: string, to: string, toRank: number, toFile: number } | null = null;
   promotionColor: 'w' | 'b' = 'w';
 
-  // CHANGED: constructor uses 'public' so the template can access gameState.status$
+  // --- Click-to-Move State ---
+  selectedSquare: string | null = null;
+  legalMoves: string[] = [];
+
   constructor(public gameState: GameStateService) {}
 
   ngOnInit(): void {
@@ -41,22 +36,11 @@ export class BoardComponent implements OnInit {
     });
   }
 
-  // Add this method inside your BoardComponent class
   isKingInCheck(piece: string | null, row: number, col: number): boolean {
     if (!piece) return false;
-
-    // Retrieve current game status from the service
-    // We use the current turn to identify which king should be highlighted red
     const status = this.gameState.getLatestStatus(); 
     if (!status || !status.isCheck) return false;
-
-    const isWhiteTurn = status.turn === 'w';
-    
-    // Check if the piece is the King belonging to the side currently in check
-    // 'K' is white king, 'k' is black king
-    const isTargetKing = isWhiteTurn ? piece === 'K' : piece === 'k';
-    
-    return isTargetKing;
+    return (status.turn === 'w') ? piece === 'K' : piece === 'k';
   }
 
   renderBoard(fen: string) {
@@ -71,27 +55,109 @@ export class BoardComponent implements OnInit {
     });
   }
 
-  // --- Update your existing onDrop method ---
+  // --- CLICK-TO-MOVE LOGIC ---
+  onSquareClick(rIdx: number, cIdx: number) {
+    const algebraic = this.getAlgebraicCoords(rIdx, cIdx);
+    const clickedPiece = this.boardGrid[rIdx][cIdx];
+    const status = this.gameState.getLatestStatus();
+    
+    // Safety check - do nothing if game is over
+    if (!status || status.isCheckmate || status.isDraw) return;
+    const currentTurn = status.turn;
+
+    if (this.selectedSquare) {
+      // 1. Clicked the exact same square -> Deselect
+      if (this.selectedSquare === algebraic) {
+        this.clearSelection();
+        return;
+      }
+
+      // 2. Clicked a valid legal move destination -> Execute Move
+      if (this.legalMoves.includes(algebraic)) {
+        const selectedRIdx = this.getRankIdx(this.selectedSquare);
+        const selectedCIdx = this.getFileIdx(this.selectedSquare);
+        const selectedPiece = this.boardGrid[selectedRIdx][selectedCIdx];
+        
+        // Handle Pawn Promotion on Click
+        const isWhitePawn = selectedPiece === 'P';
+        const isBlackPawn = selectedPiece === 'p';
+        const isPromotion = (isWhitePawn && rIdx === 0) || (isBlackPawn && rIdx === 7);
+
+        if (isPromotion) {
+          this.pendingPromotion = { from: this.selectedSquare, to: algebraic, toRank: rIdx, toFile: cIdx };
+          this.promotionColor = isWhitePawn ? 'w' : 'b';
+          this.clearSelection(); 
+          return;
+        }
+
+        // Standard Move execution
+        this.gameState.move(this.selectedSquare, algebraic);
+        this.clearSelection();
+        return;
+      }
+
+      // 3. Clicked another friendly piece -> Switch Selection
+      if (clickedPiece && this.isPieceOfColor(clickedPiece, currentTurn)) {
+        this.selectSquare(algebraic);
+        return;
+      }
+
+      // 4. Clicked anywhere else (invalid square) -> Deselect
+      this.clearSelection();
+    } else {
+      // No piece selected yet -> Select it if it belongs to the current turn's player
+      if (clickedPiece && this.isPieceOfColor(clickedPiece, currentTurn)) {
+        this.selectSquare(algebraic);
+      }
+    }
+  }
+
+  // Helpers for click-to-move
+  private isPieceOfColor(piece: string, color: 'w' | 'b'): boolean {
+    if (!piece) return false;
+    return color === 'w' ? piece === piece.toUpperCase() : piece === piece.toLowerCase();
+  }
+
+  private selectSquare(algebraic: string) {
+    this.selectedSquare = algebraic;
+    this.legalMoves = this.gameState.getLegalMoves(algebraic);
+  }
+
+  private clearSelection() {
+    this.selectedSquare = null;
+    this.legalMoves = [];
+  }
+
+  isLegalMove(rIdx: number, cIdx: number): boolean {
+    if (!this.selectedSquare) return false;
+    return this.legalMoves.includes(this.getAlgebraicCoords(rIdx, cIdx));
+  }
+
+  private getRankIdx(algebraic: string): number {
+    return 8 - parseInt(algebraic[1]);
+  }
+
+  private getFileIdx(algebraic: string): number {
+    return algebraic.charCodeAt(0) - 97; 
+  }
+
+  // --- DRAG AND DROP LOGIC ---
   onDrop(event: any, rIdx: number, cIdx: number) {
+    this.clearSelection(); // Prevent visual glitches if user drags while a piece is clicked
     const from = event.item.data;
     const to = this.getAlgebraicCoords(rIdx, cIdx);
 
-    // Grab the image element to easily check if the moving piece is a pawn
     const imgElement = event.item.element.nativeElement as HTMLImageElement;
     const isWhitePawn = imgElement.src.includes('wp.png');
     const isBlackPawn = imgElement.src.includes('bp.png');
-
-    // If White reaches rank index 0, or Black reaches rank index 7, it's a promotion
     const isPromotion = (isWhitePawn && rIdx === 0) || (isBlackPawn && rIdx === 7);
 
     if (isPromotion) {
-      // Pause the move and show the UI
       this.pendingPromotion = { from, to, toRank: rIdx, toFile: cIdx };
       this.promotionColor = isWhitePawn ? 'w' : 'b';
       return; 
     }
 
-    // Normal move execution
     this.gameState.move(from, to);
   }
 
@@ -101,7 +167,7 @@ export class BoardComponent implements OnInit {
     return files[col] + ranks[row];
   }
 
-  // --- Add these new helper methods ---
+  // --- PROMOTION MODAL HELPERS ---
   confirmPromotion(piece: string) {
     if (this.pendingPromotion) {
       this.gameState.move(this.pendingPromotion.from, this.pendingPromotion.to, piece);
@@ -113,7 +179,6 @@ export class BoardComponent implements OnInit {
     this.pendingPromotion = null;
   }
 
-  // Dynamically positions the popup exactly over the target square
   getPromotionStyle() {
     if (!this.pendingPromotion) return {};
     const isWhite = this.promotionColor === 'w';
