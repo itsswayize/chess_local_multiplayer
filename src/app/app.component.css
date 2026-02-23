@@ -42,12 +42,16 @@
 
 .chess-layout {
   display: grid;
-  grid-template-columns: 1fr 350px; /* Board takes left, Sidebar takes right 350px */
-  grid-template-rows: auto 1fr auto; /* Profiles auto-size, Move list fills remaining */
+  grid-template-columns: 1fr 350px; 
+  grid-template-rows: auto 1fr auto; 
   gap: 15px;
   width: 100vw;
-  max-width: 1400px; /* Prevents it from getting too wide on ultrawides */
-  height: 100vh;
+  max-width: 1400px; 
+  
+  /* Use dvh for desktop to prevent scrollbars, and center the grid in the screen */
+  height: 100dvh;
+  align-content: center; 
+  
   padding: 20px;
   box-sizing: border-box;
   margin: 0 auto;
@@ -143,8 +147,11 @@
   .chess-layout {
     display: flex;
     flex-direction: column;
+    justify-content: flex-start; /* Forces content to start exactly at the top */
+    
     height: auto;
-    min-height: 100vh;
+    /* Use dvh here so it fills the screen but allows scrolling if content is taller */
+    min-height: 100dvh; 
     padding: 10px;
   }
   

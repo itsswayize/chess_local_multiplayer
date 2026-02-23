@@ -9,12 +9,13 @@
 body {
   background-color: var(--bg-dark);
   color: #bababa;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  
+  /* Use min-height so the body can grow, and dvh to respect mobile URL bars */
+  min-height: 100dvh; 
+  
+  /* We remove display:flex and centering here so it scrolls naturally on mobile */
 }
 
 .main-layout {
